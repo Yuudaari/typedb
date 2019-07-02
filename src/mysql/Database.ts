@@ -1,7 +1,7 @@
 import { Connection } from "mysql";
 import Table from "./Table";
 
-export default class Database<TABLES extends { [key: string]: { [key: string]: any } }> {
+export default class Database<TABLES extends { [key: string]: any }> {
 	public constructor (private readonly connection: Connection) {
 	}
 

@@ -7,6 +7,7 @@
 		"typedb": "out/cli.js"
 	},
 	"main": "out/TypeDB.js",
+	"types": "./out/TypeDB.d.ts",
 	"dependencies": {
 		"chalk": "2.4.2",
 		"jsonfile": "5.0.0",

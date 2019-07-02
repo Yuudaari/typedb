@@ -1,4 +1,4 @@
-import { Connection } from "mysql";
+import { Connection, FieldInfo } from "mysql";
 import Column from "./Column";
 import Query from "./Query";
 import Row from "./Row";
@@ -26,10 +26,15 @@ export default class Table<SCHEMA extends { [key: string]: any; }> {
 		return new Query<SCHEMA>(this, columns as Extract<keyof SCHEMA, string>[]);
 	}
 
-	public async query (query: string) {
+	public async query (query: string): Promise<any[]>;
+	public async query (query: string, fields: true): Promise<{ results: any[], fields: FieldInfo[] }>;
+	public async query (query: string, includeFields = false) {
 		console.log(query);
-		// return new Promise((resolve, reject) => this.connection.query(query, (err, results, fields) => {
-		// 	console.log({ err, results, fields });
-		// }));
+		return new Promise((resolve, reject) => this.connection.query(query, (err, results, fields) => {
+			if (err) reject(err);
+
+			if (includeFields) resolve({ results, fields });
+			else resolve(results);
+		}));
 	}
 }

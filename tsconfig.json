@@ -17,7 +17,6 @@
     },
     "include": [
         "gulpfile.ts",
-        "gulp/**/*.ts",
-        "gulp/typings/electron-forge.d.ts"
+        "gulp/**/*.ts"
     ]
 }
