@@ -1,4 +1,4 @@
-import * as mocha from "gulp-mocha";
+import mocha from "gulp-mocha";
 import Task, { Pipe, remove } from "./gulp/Task";
 import TypescriptWatch from "./gulp/TypescriptWatch";
 

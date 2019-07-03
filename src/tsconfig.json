@@ -5,6 +5,7 @@
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "declaration": true,
+        "esModuleInterop": true,
         "noUnusedParameters": false,
         "strict": true,
         "strictPropertyInitialization": false,

@@ -1,23 +1,34 @@
 import { Connection, FieldInfo } from "mysql";
-import Column from "./Column";
+// import Column from "./Column";
 import Query from "./Query";
 import Row from "./Row";
 
 export default class Table<SCHEMA extends { [key: string]: any; }> {
 	public constructor (public readonly name: string, private readonly connection: Connection) { }
 
-	public addColumn<KEY extends Extract<keyof SCHEMA, string>> (key: KEY, type: SCHEMA[KEY], initializer: (column: Column<SCHEMA[KEY]>) => any) {
-		const column = new Column(key, type);
-		initializer(column);
-		return column;
-	}
+	// public addColumn<KEY extends Extract<keyof SCHEMA, string>> (key: KEY, type: SCHEMA[KEY], initializer: (column: Column<SCHEMA[KEY]>) => any) {
+	// 	const column = new Column(key, type);
+	// 	initializer(column);
+	// 	return column;
+	// }
 
-	public deleteColumn<KEY extends Extract<keyof SCHEMA, string>> (key: KEY) {
+	// public deleteColumn<KEY extends Extract<keyof SCHEMA, string>> (key: KEY) {
 
-	}
+	// }
 
-	public addRow (initializer: (row: Row<SCHEMA>) => any) {
+	public async insert (...rowInitializers: ((entry: Row<SCHEMA>) => any)[]) {
+		// const rowAssignments = rowInitializers.map(initializer => {
+		// 	const row = new Row<SCHEMA>();
+		// 	initializer(row);
+		// 	return row.getPendingAssignments();
+		// });
 
+		// const modifiedColumns = 
+
+		// const pendingAssignments = row.getPendingAssignments();
+		// const query = `INSERT INTO ${this.name} ()
+		// `;
+		// return new Promise((resolve, reject) => this.connection.query())
 	}
 
 	public select (all: "*"): Query<SCHEMA>;

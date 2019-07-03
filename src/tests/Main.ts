@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 
 import * as chai from "chai";
-import * as chaiAsPromised from "chai-as-promised";
+import chaiAsPromised from "chai-as-promised";
 import del from "del";
 import * as mkdirp from "mkdirp";
 import * as fs from "mz/fs";

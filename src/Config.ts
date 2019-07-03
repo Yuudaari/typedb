@@ -1,4 +1,4 @@
-import * as deepmerge from "deepmerge";
+import deepmerge from "deepmerge";
 import * as json from "jsonfile";
 import * as path from "path";
 

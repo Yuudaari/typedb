@@ -6,6 +6,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": false,
         "strict": true,
+        "esModuleInterop": true,
         "strictPropertyInitialization": false,
         "experimentalDecorators": true,
         "target": "esnext",
