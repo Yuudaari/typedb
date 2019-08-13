@@ -1,7 +1,7 @@
 {
 	"name": "typedb",
 	"description": "",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"license": "MIT",
 	"bin": {
 		"typedb": "out/cli.js"
@@ -10,10 +10,11 @@
 	"types": "./out/TypeDB.d.ts",
 	"dependencies": {
 		"chalk": "2.4.2",
-		"jsonfile": "5.0.0",
 		"deepmerge": "3.3.0",
-		"mz": "2.7.0",
+		"goodstream": "git+https://github.com/Yuudaari/goodstream.git",
+		"jsonfile": "5.0.0",
 		"mkdirp": "0.5.1",
+		"mz": "2.7.0",
 		"sanitize-filename": "1.6.1"
 	},
 	"devDependencies": {
@@ -25,7 +26,7 @@
 		"merge2": "1.2.3",
 		"typescript": "3.5.2",
 		"gulp-typescript": "5.0.1",
-		"mocha": "6.1.4",
+		"mocha": "6.2.0",
 		"gulp-mocha": "6.0.0",
 		"ts-node": "8.3.0",
 		"chai": "4.2.0",

@@ -7,6 +7,11 @@
 				"kind": "build",
 				"isDefault": true
 			},
+			"options": {
+				"env": {
+					"TS_NODE_SKIP_IGNORE": "true"
+				}
+			},
 			"type": "shell",
 			"command": "gulp watch",
 			"problemMatcher": []

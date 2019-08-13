@@ -23,7 +23,7 @@ export default class Table<SCHEMA extends { [key: string]: any; }> {
 		// 	return row.getPendingAssignments();
 		// });
 
-		// const modifiedColumns = 
+		// const modifiedColumns =
 
 		// const pendingAssignments = row.getPendingAssignments();
 		// const query = `INSERT INTO ${this.name} ()
@@ -32,16 +32,23 @@ export default class Table<SCHEMA extends { [key: string]: any; }> {
 	}
 
 	public select (all: "*"): Query<SCHEMA>;
-	public select<COLUMNS extends Extract<keyof SCHEMA, string>[]> (...columns: COLUMNS): Query<SCHEMA, COLUMNS>;
+	public select<COLUMNS extends (keyof SCHEMA)[]> (...columns: COLUMNS): Query<SCHEMA, COLUMNS>;
 	public select (...columns: string[]) {
-		return new Query<SCHEMA>(this, columns as Extract<keyof SCHEMA, string>[]);
+		return new Query<SCHEMA>(this, columns as (keyof SCHEMA)[]);
 	}
 
-	public async query (query: string): Promise<any[]>;
-	public async query (query: string, fields: true): Promise<{ results: any[], fields: FieldInfo[] }>;
-	public async query (query: string, includeFields = false) {
-		console.log(query);
-		return new Promise((resolve, reject) => this.connection.query(query, (err, results, fields) => {
+	public async query (query: string | { query: string; values: any[] }): Promise<any[]>;
+	public async query (query: string | { query: string; values: any[] }, fields: true): Promise<{ results: any[], fields: FieldInfo[] }>;
+	public async query (query: string | { query: string; values: any[] }, includeFields = false) {
+		let values: any[] = [];
+		if (typeof query === "object") {
+			values = query.values;
+			query = query.query;
+		}
+
+		console.log(query, values);
+
+		return new Promise((resolve, reject) => this.connection.query(query as string, values, (err, results, fields) => {
 			if (err) reject(err);
 
 			if (includeFields) resolve({ results, fields });
