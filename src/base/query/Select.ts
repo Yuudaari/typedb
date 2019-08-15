@@ -49,7 +49,7 @@ export type Operations<DATATYPE extends DataType> =
 		[DataType.TEXT]: StringOperation;
 	}[DATATYPE];
 
-type Result<SCHEMA, COLUMNS extends keyof SCHEMA> = {
+export type Result<SCHEMA, COLUMNS extends keyof SCHEMA> = {
 	[COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? DataTypeValue<SCHEMA[COLUMN]> : SCHEMA[COLUMN];
 };
 
@@ -60,12 +60,9 @@ export default abstract class Select<SCHEMA extends { [key: string]: any }, COLU
 	public abstract where<KEY extends COLUMNS[number]> (column: KEY, operation: "BETWEEN", value1: DataTypeValue<SCHEMA[KEY]>, value2: DataTypeValue<SCHEMA[KEY]>): this;
 	public abstract where<KEY extends COLUMNS[number]> (column: KEY, operation: "==", value: null): this;
 
-	public query (): Result<SCHEMA, COLUMNS[number]>[] {
-		return this.getTable().query(this.compile()) as any;
-	}
+	public abstract query (): Promise<Result<SCHEMA, COLUMNS[number]>[]>;
 
 	protected abstract compile (): { query: string; values: any[] };
-
 	protected abstract getTable (): Table<SCHEMA>;
 }
 

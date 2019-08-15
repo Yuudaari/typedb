@@ -21,7 +21,15 @@ export default class PostgresTable<SCHEMA extends { [key: string]: any; }> exten
 
 	public async query (query: string | { query: string; values: any[] }): Promise<any[]>;
 	public async query (query: string | { query: string; values: any[] }, fields: true): Promise<{ results: any[], fields: FieldDef[] }>;
-	@Override public async query (query: string | { query: string; values: any[] }, includeFields = false) {
+	public async query (pool: Client | Pool | PoolClient, query: string | { query: string; values: any[] }): Promise<any[]>;
+	public async query (pool: Client | Pool | PoolClient, query: string | { query: string; values: any[] }, fields: true): Promise<{ results: any[], fields: FieldDef[] }>;
+	@Override public async query (pool: Client | Pool | PoolClient | string | { query: string; values: any[] }, query?: string | { query: string; values: any[] } | boolean, includeFields = false) {
+		if (pool && (typeof pool !== "object" || {}.constructor === pool.constructor)) {
+			if (typeof query === "boolean") includeFields = query;
+			query = pool as string | { query: string; values: any[] };
+			pool = this.pool;
+		}
+
 		let values: any[] = [];
 		if (typeof query === "object") {
 			values = query.values;
@@ -30,7 +38,7 @@ export default class PostgresTable<SCHEMA extends { [key: string]: any; }> exten
 
 		console.log(query, values);
 
-		return new Promise((resolve, reject) => this.pool.query(query as string, values, (err, result) => {
+		return new Promise((resolve, reject) => (pool as Client | Pool | PoolClient).query(query as string, values, (err, result) => {
 			if (err) return reject(err);
 
 			const { rows, fields } = result;

@@ -1,7 +1,7 @@
 // tslint:disable no-string-literal
 
 import { DataTypeValue } from "../../base/DataType";
-import Select, { createExpressionBuilder, Expression, ExpressionAndOr, ExpressionBuilder, ExpressionBuilderFunction, Operations } from "../../base/query/Select";
+import Select, { createExpressionBuilder, Expression, ExpressionAndOr, ExpressionBuilder, ExpressionBuilderFunction, Operations, Result } from "../../base/query/Select";
 import Override from "../../decorator/Override";
 import MySQLTable from "../Table";
 
@@ -20,6 +20,10 @@ export default class MySQLSelect<SCHEMA extends { [key: string]: any }, COLUMNS 
 	@Override public where (column: string | ((expr: MySQLExpression<SCHEMA, COLUMNS>["is"]) => any), operation?: string, value?: string | number | null, value2?: string | number) {
 		this.expression.is(column as COLUMNS[number], operation as never, value as never);
 		return this;
+	}
+
+	@Override public async query (): Promise<Result<SCHEMA, COLUMNS[number]>[]> {
+		return this.getTable().query(this.compile()) as any;
 	}
 
 	@Override protected compile () {
