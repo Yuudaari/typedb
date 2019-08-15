@@ -1,3 +1,4 @@
-import Database from "./mysql/Database";
+import MySQLDatabase from "./mysql/Database";
+import PostgresDatabase from "./postgres/Database";
 
-export { Database as MySQL };
+export { MySQLDatabase as MySQL, PostgresDatabase as Postgres };

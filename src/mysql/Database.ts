@@ -1,11 +1,16 @@
-import { Connection } from "mysql";
-import Table from "./Table";
+import { Connection, PoolConnection } from "mysql";
+import MySQLTable from "./Table";
 
-export default class Database<TABLES extends { [key: string]: any }> {
-	public constructor (private readonly connection: Connection) {
+export default class MySQLDatabase<TABLES extends { [key: string]: any }> {
+	public constructor (private pool: Connection | PoolConnection) {
 	}
 
-	public getTable<N extends Extract<keyof TABLES, string>> (name: N) {
-		return new Table<TABLES[N]>(name, this.connection);
+	public setPool (pool: Connection | PoolConnection) {
+		this.pool = pool;
+		return this;
+	}
+
+	public getTable<N extends Extract<keyof TABLES, string>> (name: N, pool = this.pool) {
+		return new MySQLTable<TABLES[N]>(name, pool);
 	}
 }
