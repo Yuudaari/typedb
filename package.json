@@ -34,6 +34,7 @@
 		"chai-as-promised": "7.1.1",
 		"chai": "4.2.0",
 		"del": "5.0.0",
+		"even-more-min": "1.0.1",
 		"gulp-mocha": "6.0.0",
 		"gulp-plumber": "1.2.1",
 		"gulp-typescript": "5.0.1",

@@ -4,11 +4,9 @@ export type ColumnsToValues<SCHEMA extends { [key: string]: any }, COLUMNS exten
 	[index in keyof COLUMNS]: DataTypeValue<Extract<SCHEMA[Extract<COLUMNS[index], keyof SCHEMA>], DataType>>;
 };
 
-export default abstract class Insert<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> {
+export default abstract class Insert<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[], RETURN> {
 
 	public abstract values (...values: ColumnsToValues<SCHEMA, COLUMNS>): this;
 
-	public async query () {
-
-	}
+	public abstract query (): Promise<RETURN>;
 }

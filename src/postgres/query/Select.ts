@@ -1,106 +1,58 @@
 // tslint:disable no-string-literal
 
-import { Client, FieldDef, Pool, PoolClient } from "pg";
-import { DataTypeValue } from "../../base/DataType";
-import Select, { createExpressionBuilder, Expression, ExpressionAndOr, ExpressionBuilder, ExpressionBuilderFunction, Operations, Result } from "../../base/query/Select";
+import { Client, Pool, PoolClient, QueryResult } from "pg";
+import { Row } from "../../base/DataType";
+import { createExpressionBuilder, ExpressionBuilder, ExpressionBuilderFunction } from "../../base/query/Expression";
+import Select from "../../base/query/Select";
+import Bound from "../../decorator/Bound";
 import Override from "../../decorator/Override";
+import Overwrite from "../../type/Overwrite";
 import PostgresTable from "../Table";
+import { PostgresExpression } from "./Expression";
 
 export default class PostgresSelect<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> extends Select<SCHEMA, COLUMNS> {
 
-	private readonly expression = new PostgresExpression<SCHEMA, COLUMNS>();
+	private readonly expression = new PostgresExpression<SCHEMA, COLUMNS>(this.value);
+	private readonly values: any[] = [];
 
 	public constructor (private readonly table: PostgresTable<SCHEMA>, private readonly columns: "*" | COLUMNS) {
 		super();
 	}
 
-	public where (initializer: (expr: PostgresExpression<SCHEMA, COLUMNS>["is"]) => any): this;
-	public where<KEY extends COLUMNS[number]> (column: KEY, operation: Operations<SCHEMA[KEY]>, value: DataTypeValue<SCHEMA[KEY]>): this;
-	public where<KEY extends COLUMNS[number]> (column: KEY, operation: "BETWEEN", value1: DataTypeValue<SCHEMA[KEY]>, value2: DataTypeValue<SCHEMA[KEY]>): this;
-	public where<KEY extends COLUMNS[number]> (column: KEY, operation: "==", value: null): this;
-	@Override public where (column: string | ((expr: PostgresExpression<SCHEMA, COLUMNS>["is"]) => any), operation?: string, value?: string | number | null, value2?: string | number) {
-		this.expression.is(column as COLUMNS[number], operation as never, value as never);
-		return this;
+	@Override public get where (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
+		return createExpressionBuilder((column, operation, value, value2, not) => {
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
+			return this;
+		});
 	}
 
-	public async query (pool?: Client | Pool | PoolClient): Promise<Result<SCHEMA, COLUMNS[number]>[]>;
-	public async query (pool: Client | Pool | PoolClient | undefined, includeFields: true): Promise<{ results: Result<SCHEMA, COLUMNS[number]>[], fields: FieldDef[] }>;
-	@Override public async query (pool?: Client | Pool | PoolClient, includeFields?: boolean) {
-		return this.getTable().query(pool!, this.compile(), includeFields as true) as any;
+	public async query (pool?: Client | Pool | PoolClient): Promise<Row<SCHEMA, COLUMNS[number]>[]>;
+	public async query (pool: Client | Pool | PoolClient | undefined, resultObject: true): Promise<Overwrite<QueryResult, { rows: Row<SCHEMA, COLUMNS[number]>[] }>>;
+	@Override public async query (pool?: Client | Pool | PoolClient, resultObject?: boolean) {
+		const results = await this.table.query(pool!, this.compile());
+
+		if (resultObject) return results;
+		return results.rows;
 	}
 
-	@Override protected compile () {
+	@Override public async queryOne (pool?: Client | Pool | PoolClient): Promise<Row<SCHEMA, COLUMNS[number]> | undefined> {
+		const result = await this.limit(1).query(pool);
+		return result[0];
+	}
+
+	private compile () {
 		let query = `SELECT ${this.columns === "*" ? "*" : this.columns.join(",")} FROM ${this.table.name}`;
-		const where = this.expression["filters"].join("");
+
+		const where = this.expression.compile();
 		if (where) query += ` WHERE ${where}`;
-		return {
-			query,
-			values: this.expression["values"],
-		};
+
+		if (typeof this.limitAmount === "number") query += ` LIMIT ${this.limitAmount}`;
+
+		return { query, values: this.values };
 	}
 
-	@Override protected getTable () {
-		return this.table;
-	}
-}
-
-const operations: { [key: string]: string } = {
-	"==": "=",
-};
-
-class PostgresExpression<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[]> extends Expression<SCHEMA, COLUMNS> {
-
-	private filters: string[] = [];
-	private values: any[] = [];
-
-	@Override public get is (): ExpressionBuilder<SCHEMA, COLUMNS, ExpressionAndOr<SCHEMA, COLUMNS>> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			const notString = not ? "NOT " : "";
-
-			if (typeof column === "function") {
-				const expr = new PostgresExpression<SCHEMA, COLUMNS>();
-				column(expr.is);
-				this.filters.push(`(${notString}(${expr.filters.join("")}))`);
-				this.values.push(...expr.values);
-
-			} else if (value === null) this.filters.push(`(${notString}${column} IS NULL)`);
-
-			else if (operation === "BETWEEN") this.filters.push(`(${notString}${column} BETWEEN ${this.value(value)} AND ${this.value(value2)})`);
-
-			else this.filters.push(`(${notString}${column} ${operations[`${operation}`] || operation} ${this.value(value)})`);
-
-			return new PostgresExpressionAndOr(this);
-		});
-	}
-
-	private value (value?: string | number | null): "?" {
+	@Bound private value (value?: string | number | null) {
 		this.values.push(value);
-		return "?";
-	}
-}
-
-class PostgresExpressionAndOr<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[]> extends ExpressionAndOr<SCHEMA, COLUMNS> {
-
-	private get filters () {
-		return this.expression["filters"];
-	}
-	public constructor (private readonly expression: PostgresExpression<SCHEMA, COLUMNS>) {
-		super();
-	}
-
-	@Override public get and (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
-			this.filters[this.filters.length - 1] = " AND " + this.filters[this.filters.length - 1];
-			return this;
-		});
-	}
-
-	@Override public get or (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
-			this.filters[this.filters.length - 1] = " OR " + this.filters[this.filters.length - 1];
-			return this;
-		});
+		return `$${this.values.length}`;
 	}
 }

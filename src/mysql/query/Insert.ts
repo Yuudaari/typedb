@@ -2,7 +2,7 @@ import Insert, { ColumnsToValues } from "../../base/query/Insert";
 import Override from "../../decorator/Override";
 import MySQLTable from "../Table";
 
-export default class MySQLInsert<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> extends Insert<SCHEMA, COLUMNS> {
+export default class MySQLInsert<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> extends Insert<SCHEMA, COLUMNS, any> {
 
 	private valuesToAdd: ColumnsToValues<SCHEMA, COLUMNS, true>[] = [];
 
@@ -15,7 +15,7 @@ export default class MySQLInsert<SCHEMA extends { [key: string]: any }, COLUMNS 
 		return this;
 	}
 
-	@Override public async query () {
-
+	@Override public async query (): Promise<never> {
+		throw new Error("Unimplemented");
 	}
 }

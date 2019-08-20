@@ -3,6 +3,7 @@ import Table from "../base/Table";
 import Override from "../decorator/Override";
 import MySQLInsert from "./query/Insert";
 import MySQLSelect from "./query/Select";
+import MySQLUpdate from "./query/Update";
 
 export default class MySQLTable<SCHEMA extends { [key: string]: any; }> extends Table<SCHEMA> {
 	public constructor (public readonly name: string, private readonly pool: Connection | PoolConnection) {
@@ -17,6 +18,10 @@ export default class MySQLTable<SCHEMA extends { [key: string]: any; }> extends 
 	public select<COLUMNS extends (keyof SCHEMA)[]> (...columns: COLUMNS): MySQLSelect<SCHEMA, COLUMNS>;
 	@Override public select (...columns: string[]) {
 		return new MySQLSelect(this, columns as (keyof SCHEMA)[]);
+	}
+
+	@Override public update () {
+		return new MySQLUpdate<SCHEMA>(this);
 	}
 
 	public async query (query: string | { query: string; values: any[] }): Promise<any[]>;

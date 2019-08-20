@@ -1,3 +1,4 @@
+
 export enum DataType {
 	// numeric
 	INTEGER,
@@ -64,3 +65,7 @@ export type DataTypeValue<DATATYPE extends DataType | string | string[]> =
 		// [DataType.ENUM]: string;
 		// [DataType.SET]: string;
 	}[Extract<DATATYPE, DataType>];
+
+export type Row<SCHEMA, COLUMNS extends keyof SCHEMA = keyof SCHEMA> = {
+	[COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? DataTypeValue<SCHEMA[COLUMN]> : SCHEMA[COLUMN];
+};

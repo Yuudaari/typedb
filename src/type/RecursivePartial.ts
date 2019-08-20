@@ -4,3 +4,5 @@ type RecursivePartial<T> = {
 	};
 	[1]: T;
 }[T extends Map<any, any> ? 1 : T extends object ? 0 : 1];
+
+export default RecursivePartial;

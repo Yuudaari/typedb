@@ -7,7 +7,7 @@ import TypescriptWatch from "./gulp/TypescriptWatch";
 //
 
 Task.create("mocha", Pipe.create("out/tests/Main.js", { read: false })
-	.pipe(() => mocha({ reporter: "min" }))
+	.pipe(() => mocha({ reporter: "even-more-min" }))
 	.on("error", () => process.exitCode = 1));
 
 new Task("compile-test", remove("out"))

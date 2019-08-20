@@ -8,6 +8,7 @@ import * as fs from "mz/fs";
 import generateMigration from "../cli/generate-migration";
 import migrate from "../cli/migrate";
 import Config, { TypeDBConfig } from "../Config";
+import RecursivePartial from "../type/RecursivePartial";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
