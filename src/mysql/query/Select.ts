@@ -8,16 +8,16 @@ import { MySQLExpression } from "./Expression";
 
 export default class MySQLSelect<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> extends Select<SCHEMA, COLUMNS> {
 
-	private readonly expression = new MySQLExpression<SCHEMA, COLUMNS>(this.value);
+	private readonly expression = new MySQLExpression<SCHEMA>(this.value);
 	private readonly values: any[] = [];
 
 	public constructor (private readonly table: MySQLTable<SCHEMA>, private readonly columns: "*" | COLUMNS) {
 		super();
 	}
 
-	@Override public get where (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
+	@Override public get where (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
 			return this;
 		});
 	}

@@ -7,16 +7,16 @@ import { MySQLExpression } from "./Expression";
 
 export default class MySQLUpdate<SCHEMA extends { [key: string]: any }> extends Update<SCHEMA, number> {
 
-	private readonly expression = new MySQLExpression<SCHEMA, (keyof SCHEMA)[]>(this.value);
+	private readonly expression = new MySQLExpression<SCHEMA>(this.value);
 	private readonly values: any[] = [];
 
 	public constructor (private readonly table: MySQLTable<SCHEMA>) {
 		super();
 	}
 
-	@Override public get where (): ExpressionBuilder<SCHEMA, (keyof SCHEMA)[], this> {
+	@Override public get where (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, (keyof SCHEMA)[]>)(column, operation, value, value2, not);
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
 			return this;
 		});
 	}

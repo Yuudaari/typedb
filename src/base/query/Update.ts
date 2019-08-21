@@ -10,7 +10,7 @@ export default abstract class Update<SCHEMA extends { [key: string]: any }, RETU
 
 	protected readonly columnUpdates: [keyof SCHEMA, any][] = [];
 
-	public abstract get where (): ExpressionBuilder<SCHEMA, (keyof SCHEMA)[], this>;
+	public abstract get where (): ExpressionBuilder<SCHEMA, this>;
 
 	@Bound public column<COLUMN extends keyof SCHEMA> (column: COLUMN, value: DataTypeValue<Extract<SCHEMA[COLUMN], DataType>>) {
 		this.columnUpdates.push([column, value]);

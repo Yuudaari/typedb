@@ -12,16 +12,16 @@ import { PostgresExpression } from "./Expression";
 
 export default class PostgresSelect<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> extends Select<SCHEMA, COLUMNS> {
 
-	private readonly expression = new PostgresExpression<SCHEMA, COLUMNS>(this.value);
+	private readonly expression = new PostgresExpression<SCHEMA>(this.value);
 	private readonly values: any[] = [];
 
 	public constructor (private readonly table: PostgresTable<SCHEMA>, private readonly columns: "*" | COLUMNS) {
 		super();
 	}
 
-	@Override public get where (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
+	@Override public get where (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
 			return this;
 		});
 	}

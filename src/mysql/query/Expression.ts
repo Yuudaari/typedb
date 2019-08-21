@@ -7,21 +7,21 @@ const operations: { [key: string]: string } = {
 	"==": "=",
 };
 
-export class MySQLExpression<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[]> extends Expression<SCHEMA, COLUMNS> {
+export class MySQLExpression<SCHEMA extends { [key: string]: any }> extends Expression<SCHEMA> {
 	public constructor (private readonly registerValue: (value?: string | number | null) => string) {
 		super();
 	}
 
-	@Override public get is (): ExpressionBuilder<SCHEMA, COLUMNS, ExpressionAndOr<SCHEMA, COLUMNS>> {
+	@Override public get is (): ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
 			const notString = not ? "NOT " : "";
 
 			if (typeof column === "function") {
-				const expr = new MySQLExpression<SCHEMA, COLUMNS>(this.registerValue);
+				const expr = new MySQLExpression<SCHEMA>(this.registerValue);
 				column(expr.is);
 				this.filters.push(() => `(${notString}(${expr.compile()}))`);
 
-			} else if (value === null) this.filters.push(`(${notString}${column} IS NULL)`);
+			} else if (value === null) this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
 
 			else if (operation === "BETWEEN") this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
 
@@ -32,23 +32,23 @@ export class MySQLExpression<SCHEMA extends { [key: string]: any }, COLUMNS exte
 	}
 }
 
-class MySQLExpressionAndOr<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[]> extends ExpressionAndOr<SCHEMA, COLUMNS> {
+class MySQLExpressionAndOr<SCHEMA extends { [key: string]: any }> extends ExpressionAndOr<SCHEMA> {
 
-	public constructor (private readonly expression: MySQLExpression<SCHEMA, COLUMNS>) {
+	public constructor (private readonly expression: MySQLExpression<SCHEMA>) {
 		super();
 	}
 
-	@Override public get and (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
+	@Override public get and (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
 			this.expression["filters"][this.expression["filters"].length - 1] = " AND " + this.expression["filters"][this.expression["filters"].length - 1];
 			return this;
 		});
 	}
 
-	@Override public get or (): ExpressionBuilder<SCHEMA, COLUMNS, this> {
+	@Override public get or (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, COLUMNS>)(column, operation, value, value2, not);
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
 			this.expression["filters"][this.expression["filters"].length - 1] = " OR " + this.expression["filters"][this.expression["filters"].length - 1];
 			return this;
 		});

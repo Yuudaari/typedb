@@ -11,7 +11,7 @@ import { PostgresExpression } from "./Expression";
 export default class PostgresUpdate<SCHEMA extends { [key: string]: any }, RETURN_COLUMNS extends (keyof SCHEMA)[] = []>
 	extends Update<SCHEMA, number | Row<SCHEMA, RETURN_COLUMNS[number]>[] | Overwrite<QueryResult, { rows: Row<SCHEMA, RETURN_COLUMNS[number]>[] }>> {
 
-	private readonly expression = new PostgresExpression<SCHEMA, (keyof SCHEMA)[]>(this.value);
+	private readonly expression = new PostgresExpression<SCHEMA>(this.value);
 	private readonly values: any[] = [];
 	private returnColumns: RETURN_COLUMNS = [] as any;
 
@@ -19,9 +19,9 @@ export default class PostgresUpdate<SCHEMA extends { [key: string]: any }, RETUR
 		super();
 	}
 
-	@Override public get where (): ExpressionBuilder<SCHEMA, (keyof SCHEMA)[], this> {
+	@Override public get where (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA, (keyof SCHEMA)[]>)(column, operation, value, value2, not);
+			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
 			return this;
 		});
 	}

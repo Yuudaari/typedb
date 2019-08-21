@@ -47,13 +47,13 @@ export type Operations<DATATYPE extends DataType> =
 		[DataType.VARBINARY]: StringOperation;
 		[DataType.BLOB]: StringOperation;
 		[DataType.TEXT]: StringOperation;
-	}[DATATYPE];
+	}[Exclude<DATATYPE, DataType.NULL>];
 
 export default abstract class Select<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> {
 
 	protected limitAmount?: number;
 
-	public abstract get where (): ExpressionBuilder<SCHEMA, COLUMNS, this>;
+	public abstract get where (): ExpressionBuilder<SCHEMA, this>;
 
 	public limit (amt: number) {
 		this.limitAmount = amt;

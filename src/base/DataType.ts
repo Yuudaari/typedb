@@ -29,6 +29,9 @@ export enum DataType {
 	TEXT,
 	// ENUM, // handled by a string union
 	// SET, // handled by a string array
+
+	// special
+	NULL,
 }
 
 export type DataTypeValue<DATATYPE extends DataType | string | string[]> =
@@ -64,8 +67,11 @@ export type DataTypeValue<DATATYPE extends DataType | string | string[]> =
 		[DataType.TEXT]: string;
 		// [DataType.ENUM]: string;
 		// [DataType.SET]: string;
+
+		// special
+		[DataType.NULL]: null;
 	}[Extract<DATATYPE, DataType>];
 
 export type Row<SCHEMA, COLUMNS extends keyof SCHEMA = keyof SCHEMA> = {
-	[COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? DataTypeValue<SCHEMA[COLUMN]> : SCHEMA[COLUMN];
+	[COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? Exclude<DataTypeValue<SCHEMA[COLUMN]>, null> : SCHEMA[COLUMN];
 };
