@@ -80,11 +80,3 @@ describe("CLI", () => {
 		});
 	});
 });
-
-/*
-const connection = mysql.createConnection({
-	user: "root",
-	password: "potato",
-});
-connection.connect();
-*/
