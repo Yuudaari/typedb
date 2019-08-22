@@ -15,7 +15,7 @@ export default class MySQLTable<SCHEMA extends { [key: string]: any; }> extends 
 	}
 
 	public select (all: "*"): MySQLSelect<SCHEMA>;
-	public select<COLUMNS extends (keyof SCHEMA)[]> (...columns: COLUMNS): MySQLSelect<SCHEMA, COLUMNS>;
+	public select<COLUMNS extends (keyof SCHEMA)[]> (...columns: COLUMNS): COLUMNS["length"] extends 0 ? never : MySQLSelect<SCHEMA, COLUMNS>;
 	@Override public select (...columns: string[]) {
 		return new MySQLSelect(this, columns as (keyof SCHEMA)[]);
 	}

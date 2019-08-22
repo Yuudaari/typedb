@@ -10,6 +10,11 @@ export abstract class Expression<SCHEMA extends { [key: string]: any }> {
 		return this.filters.map(filter => typeof filter === "string" ? filter : filter())
 			.join("");
 	}
+
+	protected tweakLastFilter (tweaker: (filter: string) => string) {
+		const existingFilter = this.filters[this.filters.length - 1];
+		this.filters[this.filters.length - 1] = () => tweaker(typeof existingFilter === "string" ? existingFilter : existingFilter());
+	}
 }
 
 export abstract class ExpressionAndOr<SCHEMA extends { [key: string]: any }> {

@@ -44,7 +44,7 @@ export type DataTypeValue<DATATYPE extends DataType | string | string[]> =
 		[DataType.SMALLINT]: number;
 		[DataType.TINYINT]: number;
 		[DataType.MEDIUMINT]: number;
-		[DataType.BIGINT]: number;
+		[DataType.BIGINT]: number | bigint;
 		[DataType.DECIMAL]: number;
 		[DataType.NUMERIC]: number;
 		[DataType.FLOAT]: number;

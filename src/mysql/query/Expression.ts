@@ -41,7 +41,7 @@ class MySQLExpressionAndOr<SCHEMA extends { [key: string]: any }> extends Expres
 	@Override public get and (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
 			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
-			this.expression["filters"][this.expression["filters"].length - 1] = " AND " + this.expression["filters"][this.expression["filters"].length - 1];
+			this.expression["tweakLastFilter"](filter => ` AND ${filter}`);
 			return this;
 		});
 	}
@@ -49,7 +49,7 @@ class MySQLExpressionAndOr<SCHEMA extends { [key: string]: any }> extends Expres
 	@Override public get or (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((column, operation, value, value2, not) => {
 			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
-			this.expression["filters"][this.expression["filters"].length - 1] = " OR " + this.expression["filters"][this.expression["filters"].length - 1];
+			this.expression["tweakLastFilter"](filter => ` OR ${filter}`);
 			return this;
 		});
 	}
