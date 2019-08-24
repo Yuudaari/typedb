@@ -1,5 +1,5 @@
 import { DataTypeValue } from "../DataType";
-import { Operations } from "./Select";
+import { Operations } from "../Operations";
 export declare abstract class Expression<SCHEMA extends {
     [key: string]: any;
 }> {

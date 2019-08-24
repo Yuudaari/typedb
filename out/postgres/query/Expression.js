@@ -14,6 +14,8 @@ const Expression_1 = require("../../base/query/Expression");
 const Override_1 = __importDefault(require("../../decorator/Override"));
 const operations = {
     "==": "=",
+    "~~": "=",
+    "!~": "!=",
 };
 class PostgresExpression extends Expression_1.Expression {
     constructor(registerValue) {
@@ -32,6 +34,8 @@ class PostgresExpression extends Expression_1.Expression {
                 this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
             else if (operation === "BETWEEN")
                 this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
+            else if (operation === "~~" || operation === "!~")
+                this.filters.push(() => `(${notString}lower(${column}) ${operations[`${operation}`] || operation} ${this.registerValue(`${value}`.toLowerCase())})`);
             else
                 this.filters.push(() => `(${notString}${column} ${operations[`${operation}`] || operation} ${this.registerValue(value)})`);
             return new PostgresExpressionAndOr(this);

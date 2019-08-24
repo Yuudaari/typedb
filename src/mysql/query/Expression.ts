@@ -5,6 +5,8 @@ import Override from "../../decorator/Override";
 
 const operations: { [key: string]: string } = {
 	"==": "=",
+	"~~": "=",
+	"!~": "!=",
 };
 
 export class MySQLExpression<SCHEMA extends { [key: string]: any }> extends Expression<SCHEMA> {
@@ -21,9 +23,14 @@ export class MySQLExpression<SCHEMA extends { [key: string]: any }> extends Expr
 				column(expr.is);
 				this.filters.push(() => `(${notString}(${expr.compile()}))`);
 
-			} else if (value === null) this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
+			} else if (value === null)
+				this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
 
-			else if (operation === "BETWEEN") this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
+			else if (operation === "BETWEEN")
+				this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
+
+			else if (operation === "~~" || operation === "!~")
+				this.filters.push(() => `(${notString}lower(${column}) ${operations[`${operation}`] || operation} ${this.registerValue(`${value}`.toLowerCase())})`);
 
 			else this.filters.push(() => `(${notString}${column} ${operations[`${operation}`] || operation} ${this.registerValue(value)})`);
 
