@@ -34,10 +34,10 @@ export enum DataType {
 	NULL,
 }
 
-export type DataTypeValue<DATATYPE extends DataType | string | string[]> =
+export type DataTypeValue<DATATYPE> =
 	DATATYPE extends string ? DATATYPE :
 	DATATYPE extends string[] ? DATATYPE :
-	{
+	DATATYPE extends DataType ? {
 		// numeric
 		[DataType.INTEGER]: number;
 		[DataType.INT]: number;
@@ -70,7 +70,8 @@ export type DataTypeValue<DATATYPE extends DataType | string | string[]> =
 
 		// special
 		[DataType.NULL]: null;
-	}[Extract<DATATYPE, DataType>];
+	}[DATATYPE]
+	: never;
 
 export type Row<SCHEMA, COLUMNS extends keyof SCHEMA = keyof SCHEMA> = {
 	[COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? Exclude<DataTypeValue<SCHEMA[COLUMN]>, null> : SCHEMA[COLUMN];

@@ -11,7 +11,6 @@
 	"dependencies": {
 		"chalk": "2.4.2",
 		"deepmerge": "3.3.0",
-		"goodstream": "git+https://github.com/Yuudaari/goodstream.git",
 		"jsonfile": "5.0.0",
 		"mkdirp": "0.5.1",
 		"mz": "2.7.0",
