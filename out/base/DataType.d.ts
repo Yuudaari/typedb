@@ -23,7 +23,9 @@ export declare enum DataType {
     TEXT = 21,
     NULL = 22
 }
-export declare type DataTypeValue<DATATYPE> = DATATYPE extends string ? DATATYPE : DATATYPE extends string[] ? DATATYPE : DATATYPE extends DataType ? {
+export declare type DataTypeValue<DATATYPE> = DATATYPE extends string ? DATATYPE : DATATYPE extends string[] ? DATATYPE : DATATYPE extends DataType[] ? DataTypeValueInternal<DATATYPE extends (infer D)[] ? Extract<D, DataType> : never>[] : DATATYPE extends DataType ? DataTypeValueInternal<DATATYPE> : never;
+export declare type DataTypeArrayValue<DATATYPE> = DATATYPE extends DataType[] ? DataTypeValueInternal<DATATYPE extends (infer D)[] ? Extract<D, DataType> : never> : DataTypeValue<DATATYPE>;
+declare type DataTypeValueInternal<DATATYPE extends DataType> = {
     [DataType.INTEGER]: number;
     [DataType.INT]: number;
     [DataType.SMALLINT]: number;
@@ -47,7 +49,8 @@ export declare type DataTypeValue<DATATYPE> = DATATYPE extends string ? DATATYPE
     [DataType.BLOB]: string;
     [DataType.TEXT]: string;
     [DataType.NULL]: null;
-}[DATATYPE] : never;
+}[DATATYPE];
 export declare type Row<SCHEMA, COLUMNS extends keyof SCHEMA = keyof SCHEMA> = {
     [COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? Exclude<DataTypeValue<SCHEMA[COLUMN]>, null> : SCHEMA[COLUMN];
 };
+export {};

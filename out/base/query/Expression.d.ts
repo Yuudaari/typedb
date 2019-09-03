@@ -1,4 +1,4 @@
-import { DataTypeValue } from "../DataType";
+import { DataTypeArrayValue, DataTypeValue } from "../DataType";
 import { Operations } from "../Operations";
 export declare abstract class Expression<SCHEMA extends {
     [key: string]: any;
@@ -19,6 +19,7 @@ export interface ExpressionBuilder<SCHEMA extends {
 }, RETURN> {
     (initializer: (expr: ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>) => any): RETURN;
     <KEY extends keyof SCHEMA>(column: KEY, operation: Operations<SCHEMA[KEY]>, value: DataTypeValue<SCHEMA[KEY]>): RETURN;
+    <KEY extends keyof SCHEMA>(column: KEY, operation: "CONTAINS", value: DataTypeArrayValue<SCHEMA[KEY]>): RETURN;
     <KEY extends keyof SCHEMA>(column: KEY, operation: "BETWEEN", value1: DataTypeValue<SCHEMA[KEY]>, value2: DataTypeValue<SCHEMA[KEY]>): RETURN;
     <KEY extends keyof SCHEMA>(column: KEY, operation: "==" | "!=", value: null): RETURN;
     not: ExpressionBuilder<SCHEMA, RETURN>;
