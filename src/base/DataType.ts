@@ -41,6 +41,10 @@ export type DataTypeValue<DATATYPE> =
 	DATATYPE extends DataType ? DataTypeValueInternal<DATATYPE>
 	: never;
 
+export type DataTypeArrayValue<DATATYPE> =
+	DATATYPE extends DataType[] ? DataTypeValueInternal<DATATYPE extends (infer D)[] ? Extract<D, DataType> : never>
+	: DataTypeValue<DATATYPE>;
+
 type DataTypeValueInternal<DATATYPE extends DataType> = {
 	// numeric
 	[DataType.INTEGER]: number;
