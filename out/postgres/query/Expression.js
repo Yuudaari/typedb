@@ -34,6 +34,8 @@ class PostgresExpression extends Expression_1.Expression {
                 this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
             else if (operation === "CONTAINS")
                 this.filters.push(() => `(${notString}${this.registerValue(value)} = ANY(${column}))`);
+            else if (operation === "IN")
+                this.filters.push(() => `(${notString}${column} = ANY(${this.registerValue(value)}))`);
             else if (operation === "BETWEEN")
                 this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
             else if (operation === "~~" || operation === "!~")

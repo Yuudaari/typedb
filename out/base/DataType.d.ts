@@ -51,6 +51,6 @@ declare type DataTypeValueInternal<DATATYPE extends DataType> = {
     [DataType.NULL]: null;
 }[DATATYPE];
 export declare type Row<SCHEMA, COLUMNS extends keyof SCHEMA = keyof SCHEMA> = {
-    [COLUMN in COLUMNS]: SCHEMA[COLUMN] extends DataType ? Exclude<DataTypeValue<SCHEMA[COLUMN]>, null> : SCHEMA[COLUMN];
+    [COLUMN in COLUMNS]: Exclude<DataTypeValue<SCHEMA[COLUMN]>, null>;
 };
 export {};

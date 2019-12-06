@@ -34,6 +34,8 @@ class MySQLExpression extends Expression_1.Expression {
                 this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
             else if (operation === "CONTAINS")
                 throw new Error("Unimplemented query type");
+            else if (operation === "IN")
+                throw new Error("Unimplemented query type");
             else if (operation === "BETWEEN")
                 this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
             else if (operation === "~~" || operation === "!~")
