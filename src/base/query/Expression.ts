@@ -26,6 +26,7 @@ export interface ExpressionBuilder<SCHEMA extends { [key: string]: any }, RETURN
 	(initializer: (expr: ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>) => any): RETURN;
 	<KEY extends keyof SCHEMA> (column: KEY, operation: Operations<SCHEMA[KEY]>, value: DataTypeValue<SCHEMA[KEY]>): RETURN;
 	<KEY extends keyof SCHEMA> (column: KEY, operation: "CONTAINS", value: DataTypeArrayValue<SCHEMA[KEY]>): RETURN;
+	<KEY extends keyof SCHEMA> (column: KEY, operation: "IN", value: DataTypeValue<SCHEMA[KEY]>[]): RETURN;
 	<KEY extends keyof SCHEMA> (column: KEY, operation: "BETWEEN", value1: DataTypeValue<SCHEMA[KEY]>, value2: DataTypeValue<SCHEMA[KEY]>): RETURN;
 	<KEY extends keyof SCHEMA> (column: KEY, operation: "==" | "!=", value: null): RETURN;
 
