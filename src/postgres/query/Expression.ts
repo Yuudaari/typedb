@@ -33,6 +33,12 @@ export class PostgresExpression<SCHEMA extends { [key: string]: any }> extends E
 			else if (operation === "IN")
 				this.filters.push(() => `(${notString}${column} = ANY(${this.registerValue(value)}))`);
 
+			else if (operation === "HAS_SUBSTR")
+				this.filters.push(() => `(${notString}position(${this.registerValue(value)} in ${column}) > 0)`);
+
+			else if (operation === "IS_SUBSTR")
+				this.filters.push(() => `(${notString}position(${column} in ${this.registerValue(value)}) > 0)`);
+
 			else if (operation === "BETWEEN")
 				this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
 

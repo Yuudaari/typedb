@@ -15,6 +15,9 @@ enum StringOperations {
 	"!=",
 	"~~",
 	"!~",
+	"IN",
+	"HAS_SUBSTR",
+	"IS_SUBSTR",
 }
 
 type NumericOperation = keyof typeof NumericOperations;
@@ -23,7 +26,8 @@ type StringOperation = keyof typeof StringOperations;
 
 export type Operations<DATATYPE extends DataType> =
 	DATATYPE extends string ? StringOperation :
-	DATATYPE extends string[] ? StringOperation : {
+	DATATYPE extends string[] ? StringOperation :
+	DATATYPE extends any[] ? never : {
 		// numeric
 		[DataType.INTEGER]: NumericOperation;
 		[DataType.INT]: NumericOperation;
