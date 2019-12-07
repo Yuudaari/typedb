@@ -36,6 +36,10 @@ class PostgresExpression extends Expression_1.Expression {
                 this.filters.push(() => `(${notString}${this.registerValue(value)} = ANY(${column}))`);
             else if (operation === "IN")
                 this.filters.push(() => `(${notString}${column} = ANY(${this.registerValue(value)}))`);
+            else if (operation === "HAS_SUBSTR")
+                this.filters.push(() => `(${notString}position(${this.registerValue(value)} in ${column}) > 0)`);
+            else if (operation === "IS_SUBSTR")
+                this.filters.push(() => `(${notString}position(${column} in ${this.registerValue(value)}) > 0)`);
             else if (operation === "BETWEEN")
                 this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
             else if (operation === "~~" || operation === "!~")

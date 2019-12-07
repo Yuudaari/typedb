@@ -12,11 +12,14 @@ declare enum StringOperations {
     "==" = 0,
     "!=" = 1,
     "~~" = 2,
-    "!~" = 3
+    "!~" = 3,
+    "IN" = 4,
+    "HAS_SUBSTR" = 5,
+    "IS_SUBSTR" = 6
 }
 declare type NumericOperation = keyof typeof NumericOperations;
 declare type StringOperation = keyof typeof StringOperations;
-export declare type Operations<DATATYPE extends DataType> = DATATYPE extends string ? StringOperation : DATATYPE extends string[] ? StringOperation : {
+export declare type Operations<DATATYPE extends DataType> = DATATYPE extends string ? StringOperation : DATATYPE extends string[] ? StringOperation : DATATYPE extends any[] ? never : {
     [DataType.INTEGER]: NumericOperation;
     [DataType.INT]: NumericOperation;
     [DataType.SMALLINT]: NumericOperation;

@@ -17,4 +17,7 @@ var StringOperations;
     StringOperations[StringOperations["!="] = 1] = "!=";
     StringOperations[StringOperations["~~"] = 2] = "~~";
     StringOperations[StringOperations["!~"] = 3] = "!~";
+    StringOperations[StringOperations["IN"] = 4] = "IN";
+    StringOperations[StringOperations["HAS_SUBSTR"] = 5] = "HAS_SUBSTR";
+    StringOperations[StringOperations["IS_SUBSTR"] = 6] = "IS_SUBSTR";
 })(StringOperations || (StringOperations = {}));
