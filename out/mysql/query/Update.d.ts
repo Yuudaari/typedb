@@ -8,7 +8,7 @@ export default class MySQLUpdate<SCHEMA extends {
     private readonly expression;
     private readonly values;
     constructor(table: MySQLTable<SCHEMA>);
-    readonly where: ExpressionBuilder<SCHEMA, this>;
+    get where(): ExpressionBuilder<SCHEMA, this>;
     query(): Promise<any>;
     private compile;
     private value;

@@ -14,7 +14,7 @@ export default class PostgresUpdate<SCHEMA extends {
     private readonly values;
     private returnColumns;
     constructor(table: PostgresTable<SCHEMA>);
-    readonly where: ExpressionBuilder<SCHEMA, this>;
+    get where(): ExpressionBuilder<SCHEMA, this>;
     returning<COLUMNS_NEW extends (keyof SCHEMA)[] | ["*"]>(...columns: COLUMNS_NEW): PostgresUpdate<SCHEMA, COLUMNS_NEW extends ["*"] ? (keyof SCHEMA)[] : COLUMNS_NEW>;
     query(pool?: Client | Pool | PoolClient): Promise<RETURN_COLUMNS["length"] extends 0 ? number : Row<SCHEMA, RETURN_COLUMNS[number]>[]>;
     query(pool: Client | Pool | PoolClient | undefined, resultObject: true): Promise<Overwrite<QueryResult, {

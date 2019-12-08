@@ -10,7 +10,7 @@ export default class MySQLSelect<SCHEMA extends {
     private readonly expression;
     private readonly values;
     constructor(table: MySQLTable<SCHEMA>, columns: "*" | COLUMNS);
-    readonly where: ExpressionBuilder<SCHEMA, this>;
+    get where(): ExpressionBuilder<SCHEMA, this>;
     query(): Promise<Row<SCHEMA, COLUMNS[number]>[]>;
     queryOne(): Promise<Row<SCHEMA, COLUMNS[number]> | undefined>;
     private compile;

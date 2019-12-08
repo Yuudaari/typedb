@@ -4,5 +4,5 @@ export declare class MySQLExpression<SCHEMA extends {
 }> extends Expression<SCHEMA> {
     private readonly registerValue;
     constructor(registerValue: (value?: string | number | null) => string);
-    readonly is: ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>;
+    get is(): ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>;
 }

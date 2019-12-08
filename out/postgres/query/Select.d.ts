@@ -12,7 +12,7 @@ export default class PostgresSelect<SCHEMA extends {
     private readonly expression;
     private readonly values;
     constructor(table: PostgresTable<SCHEMA>, columns: "*" | COLUMNS);
-    readonly where: ExpressionBuilder<SCHEMA, this>;
+    get where(): ExpressionBuilder<SCHEMA, this>;
     query(pool?: Client | Pool | PoolClient): Promise<Row<SCHEMA, COLUMNS[number]>[]>;
     query(pool: Client | Pool | PoolClient | undefined, resultObject: true): Promise<Overwrite<QueryResult, {
         rows: Row<SCHEMA, COLUMNS[number]>[];

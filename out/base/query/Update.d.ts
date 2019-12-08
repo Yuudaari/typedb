@@ -9,7 +9,7 @@ export default abstract class Update<SCHEMA extends {
     [key: string]: any;
 }, RETURN> implements UpdateColumns<SCHEMA> {
     protected readonly columnUpdates: [keyof SCHEMA, any][];
-    abstract readonly where: ExpressionBuilder<SCHEMA, this>;
+    abstract get where(): ExpressionBuilder<SCHEMA, this>;
     column<COLUMN extends keyof SCHEMA>(column: COLUMN, value: DataTypeValue<SCHEMA[COLUMN]>): this;
     columns(initializer: (update: UpdateColumns<SCHEMA>) => any): this;
     abstract query(): Promise<RETURN>;

@@ -4,15 +4,15 @@ export declare abstract class Expression<SCHEMA extends {
     [key: string]: any;
 }> {
     protected readonly filters: (string | (() => string))[];
-    abstract readonly is: ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>;
+    abstract get is(): ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>;
     compile(): string;
     protected tweakLastFilter(tweaker: (filter: string) => string): void;
 }
 export declare abstract class ExpressionAndOr<SCHEMA extends {
     [key: string]: any;
 }> {
-    abstract readonly and: ExpressionBuilder<SCHEMA, this>;
-    abstract readonly or: ExpressionBuilder<SCHEMA, this>;
+    abstract get and(): ExpressionBuilder<SCHEMA, this>;
+    abstract get or(): ExpressionBuilder<SCHEMA, this>;
 }
 declare type ColumnOperations<SCHEMA extends {
     [key: string]: any;
