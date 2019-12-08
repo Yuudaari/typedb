@@ -7,6 +7,7 @@ enum NumericOperations {
 	">",
 	"<=",
 	">=",
+	"IN",
 	"BETWEEN",
 }
 
@@ -17,17 +18,31 @@ enum StringOperations {
 	"!~",
 	"IN",
 	"HAS_SUBSTR",
+	"HAVE_SUBSTR",
 	"IS_SUBSTR",
 }
 
-type NumericOperation = keyof typeof NumericOperations;
+enum ArrayOperations {
+	"CONTAINS",
+	"@>",
+	"CONTAINED_BY",
+	"<@",
+}
 
+enum TSVectorOperations {
+	"HAVE_WORD",
+	"HAS_WORD",
+}
+
+type NumericOperation = keyof typeof NumericOperations;
 type StringOperation = keyof typeof StringOperations;
+type ArrayOperation = keyof typeof ArrayOperations;
+type TSVectorOperation = keyof typeof TSVectorOperations;
 
 export type Operations<DATATYPE extends DataType> =
 	DATATYPE extends string ? StringOperation :
 	DATATYPE extends string[] ? StringOperation :
-	DATATYPE extends any[] ? never : {
+	DATATYPE extends any[] ? ArrayOperation : {
 		// numeric
 		[DataType.INTEGER]: NumericOperation;
 		[DataType.INT]: NumericOperation;
@@ -55,4 +70,7 @@ export type Operations<DATATYPE extends DataType> =
 		[DataType.VARBINARY]: StringOperation;
 		[DataType.BLOB]: StringOperation;
 		[DataType.TEXT]: StringOperation;
+
+		// special
+		[DataType.TSVECTOR]: TSVectorOperation;
 	}[Exclude<DATATYPE, DataType.NULL>];

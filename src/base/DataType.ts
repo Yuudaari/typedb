@@ -32,6 +32,7 @@ export enum DataType {
 
 	// special
 	NULL,
+	TSVECTOR,
 }
 
 export type DataTypeValue<DATATYPE> =
@@ -73,6 +74,7 @@ type DataTypeValueInternal<DATATYPE extends DataType> = {
 	[DataType.VARBINARY]: string;
 	[DataType.BLOB]: string;
 	[DataType.TEXT]: string;
+	[DataType.TSVECTOR]: string;
 	// [DataType.ENUM]: string;
 	// [DataType.SET]: string;
 

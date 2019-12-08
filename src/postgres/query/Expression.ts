@@ -1,6 +1,5 @@
-// tslint:disable no-string-literal
-
-import { createExpressionBuilder, Expression, ExpressionAndOr, ExpressionBuilder, ExpressionBuilderFunction } from "../../base/query/Expression";
+import { createExpressionBuilder, Expression, ExpressionAndOr, ExpressionBuilder, ExpressionBuilderOptions } from "../../base/query/Expression";
+import Bound from "../../decorator/Bound";
 import Override from "../../decorator/Override";
 
 const operations: { [key: string]: string } = {
@@ -9,46 +8,67 @@ const operations: { [key: string]: string } = {
 	"!~": "!=",
 };
 
+type ExpressionBuilderOptions2 = ExpressionBuilderOptions & { needsNewAndOrBuilder?: false };
+
 export class PostgresExpression<SCHEMA extends { [key: string]: any }> extends Expression<SCHEMA> {
 
-	public constructor (private readonly registerValue: (value?: string | number | null) => string) {
+	public constructor (private readonly registerValue: (value?: string | number | null | (string | number | null)[]) => string) {
 		super();
 	}
 
 	@Override public get is (): ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			const notString = not ? "NOT " : "";
+		return createExpressionBuilder(this.createBuilder);
+	}
 
-			if (typeof column === "function") {
-				const expr = new PostgresExpression<SCHEMA>(this.registerValue);
-				column(expr.is);
-				this.filters.push(() => `(${notString}(${expr.compile()}))`);
+	@Bound
+	public createBuilder (options: ExpressionBuilderOptions2, column: string | ((expr: ExpressionBuilder<SCHEMA, any>) => any), operation?: string, ...values: (string | number | null)[]) {
+		const builder = (options.needsNewAndOrBuilder === false ? undefined : new PostgresExpressionAndOr(this))!;
 
-			} else if (value === null)
-				this.filters.push(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
+		const notString = options.not ? "NOT " : "";
 
-			else if (operation === "CONTAINS")
-				this.filters.push(() => `(${notString}${this.registerValue(value)} = ANY(${column}))`);
+		if ("condition" in options)
+			if (!options.condition || (typeof options.condition === "function" && !options.condition())) {
+				this["lastFilterEditable"] = false;
+				return builder;
+			}
 
-			else if (operation === "IN")
-				this.filters.push(() => `(${notString}${column} = ANY(${this.registerValue(value)}))`);
+		if (typeof column === "function") {
+			const expr = new PostgresExpression<SCHEMA>(this.registerValue);
+			column(expr.is);
+			this.addFilter(() => `(${notString}(${expr.compile()}))`);
 
-			else if (operation === "HAS_SUBSTR")
-				this.filters.push(() => `(${notString}position(${this.registerValue(value)} in ${column}) > 0)`);
+		} else if (values[0] === null)
+			this.addFilter(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
 
-			else if (operation === "IS_SUBSTR")
-				this.filters.push(() => `(${notString}position(${column} in ${this.registerValue(value)}) > 0)`);
+		else if (operation === "CONTAINS" || operation === "@>")
+			this.addFilter(() => values.length === 1 ? `(${notString}${this.registerValue(values[0])} = ANY(${column}))`
+				: `(${notString}${column} @> ${this.registerValue(values)})`);
 
-			else if (operation === "BETWEEN")
-				this.filters.push(() => `(${notString}${column} BETWEEN ${this.registerValue(value)} AND ${this.registerValue(value2)})`);
+		else if (operation === "CONTAINED_BY" || operation === "<@")
+			this.addFilter(() => `(${notString}${column} <@ ${this.registerValue(values)})`);
 
-			else if (operation === "~~" || operation === "!~")
-				this.filters.push(() => `(${notString}lower(${column}) ${operations[`${operation}`] || operation} ${this.registerValue(`${value}`.toLowerCase())})`);
+		else if (operation === "IN")
+			this.addFilter(() => `(${notString}${column} = ANY(${this.registerValue(values[0])}))`);
 
-			else this.filters.push(() => `(${notString}${column} ${operations[`${operation}`] || operation} ${this.registerValue(value)})`);
+		else if (operation === "HAVE_SUBSTR" || operation === "HAS_SUBSTR")
+			this.addFilter(() => `(${notString}position(${this.registerValue(values[0])} in ${column}) > 0)`);
 
-			return new PostgresExpressionAndOr(this);
-		});
+		else if (operation === "SUBSTR_OF")
+			this.addFilter(() => `(${notString}position(${column} in ${this.registerValue(values[0])}) > 0)`);
+
+		else if (operation === "HAVE_WORD" || operation === "HAS_WORD")
+			this.addFilter(() => `(${notString}${column} @@ to_tsquery(${this.registerValue(values[0])}))`);
+
+		else if (operation === "BETWEEN")
+			this.addFilter(() => `(${notString}${column} BETWEEN ${this.registerValue(values[0])} AND ${this.registerValue(values[1])})`);
+
+		else if (operation === "~~" || operation === "!~")
+			this.addFilter(() => `(${notString}lower(${column}) ${operations[`${operation}`] || operation} ${this.registerValue(`${values[0]}`.toLowerCase())})`);
+
+		else this.addFilter(() => `(${notString}${column} ${operations[`${operation}`] || operation} ${this.registerValue(values[0])})`);
+
+		this["lastFilterEditable"] = true;
+		return builder;
 	}
 }
 
@@ -59,16 +79,16 @@ class PostgresExpressionAndOr<SCHEMA extends { [key: string]: any }> extends Exp
 	}
 
 	@Override public get and (): ExpressionBuilder<SCHEMA, this> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
+		return createExpressionBuilder((options, column, operation, ...values) => {
+			this.expression.createBuilder({ ...options, needsNewAndOrBuilder: false }, column, operation, ...values);
 			this.expression["tweakLastFilter"](filter => ` AND ${filter}`);
 			return this;
 		});
 	}
 
 	@Override public get or (): ExpressionBuilder<SCHEMA, this> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
+		return createExpressionBuilder((options, column, operation, ...values) => {
+			this.expression.createBuilder({ ...options, needsNewAndOrBuilder: false }, column, operation, ...values);
 			this.expression["tweakLastFilter"](filter => ` OR ${filter}`);
 			return this;
 		});
