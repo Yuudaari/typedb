@@ -21,7 +21,6 @@ export default class PostgresSelect<SCHEMA extends { [key: string]: any }, COLUM
 
 	@Override public get where (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((options, column, operation, ...values) => {
-			console.log("select where anon", options, column, operation, values);
 			this.expression.createBuilder(options, column, operation, ...values);
 			return this;
 		});
