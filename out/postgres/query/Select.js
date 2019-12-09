@@ -24,8 +24,9 @@ class PostgresSelect extends Select_1.default {
         this.values = [];
     }
     get where() {
-        return Expression_1.createExpressionBuilder((column, operation, value, value2, not) => {
-            this.expression.is(column, operation, value, value2, not);
+        return Expression_1.createExpressionBuilder((options, column, operation, ...values) => {
+            console.log("select where anon", options, column, operation, values);
+            this.expression.createBuilder(options, column, operation, ...values);
             return this;
         });
     }

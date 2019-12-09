@@ -21,7 +21,8 @@ export declare enum DataType {
     VARBINARY = 19,
     BLOB = 20,
     TEXT = 21,
-    NULL = 22
+    NULL = 22,
+    TSVECTOR = 23
 }
 export declare type DataTypeValue<DATATYPE> = DATATYPE extends string ? DATATYPE : DATATYPE extends string[] ? DATATYPE : DATATYPE extends DataType[] ? DataTypeValueInternal<DATATYPE extends (infer D)[] ? Extract<D, DataType> : never>[] : DATATYPE extends DataType ? DataTypeValueInternal<DATATYPE> : never;
 export declare type DataTypeArrayValue<DATATYPE> = DATATYPE extends DataType[] ? DataTypeValueInternal<DATATYPE extends (infer D)[] ? Extract<D, DataType> : never> : DataTypeValue<DATATYPE>;
@@ -48,6 +49,7 @@ declare type DataTypeValueInternal<DATATYPE extends DataType> = {
     [DataType.VARBINARY]: string;
     [DataType.BLOB]: string;
     [DataType.TEXT]: string;
+    [DataType.TSVECTOR]: string;
     [DataType.NULL]: null;
 }[DATATYPE];
 export declare type Row<SCHEMA, COLUMNS extends keyof SCHEMA = keyof SCHEMA> = {

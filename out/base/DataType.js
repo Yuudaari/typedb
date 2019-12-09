@@ -31,4 +31,5 @@ var DataType;
     // SET, // handled by a string array
     // special
     DataType[DataType["NULL"] = 22] = "NULL";
+    DataType[DataType["TSVECTOR"] = 23] = "TSVECTOR";
 })(DataType = exports.DataType || (exports.DataType = {}));

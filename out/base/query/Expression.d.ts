@@ -3,10 +3,12 @@ import { Operations } from "../Operations";
 export declare abstract class Expression<SCHEMA extends {
     [key: string]: any;
 }> {
-    protected readonly filters: (string | (() => string))[];
+    protected lastFilterEditable: boolean;
+    private readonly filters;
     abstract get is(): ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>;
     compile(): string;
     protected tweakLastFilter(tweaker: (filter: string) => string): void;
+    protected addFilter(filter: string | (() => string)): void;
 }
 export declare abstract class ExpressionAndOr<SCHEMA extends {
     [key: string]: any;
@@ -16,21 +18,30 @@ export declare abstract class ExpressionAndOr<SCHEMA extends {
 }
 declare type ColumnOperations<SCHEMA extends {
     [key: string]: any;
-}, KEY extends keyof SCHEMA> = Operations<SCHEMA[KEY]> | "CONTAINS" | "==" | "!=";
+}, KEY extends keyof SCHEMA> = Operations<SCHEMA[KEY]> | "==" | "!=";
 export interface ExpressionBuilder<SCHEMA extends {
     [key: string]: any;
-}, RETURN> {
+}, RETURN> extends ExpressionBuilderExtensions<SCHEMA, RETURN> {
     (initializer: (expr: ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>) => any): RETURN;
     <KEY extends keyof SCHEMA, OPERATION extends ColumnOperations<SCHEMA, KEY>>(column: KEY, operation: OPERATION, ...args: ExpressionBuilderArguments<SCHEMA, KEY, OPERATION>): RETURN;
+}
+interface ExpressionBuilderExtensions<SCHEMA extends {
+    [key: string]: any;
+}, RETURN> {
     not: ExpressionBuilder<SCHEMA, RETURN>;
+    if<KEY extends keyof SCHEMA, OPERATION extends ColumnOperations<SCHEMA, KEY>>(condition: any, column: KEY, operation: OPERATION, ...args: ExpressionBuilderArguments<SCHEMA, KEY, OPERATION>): RETURN;
 }
 declare type ExpressionBuilderArguments<SCHEMA extends {
     [key: string]: any;
-}, KEY extends keyof SCHEMA, OPERATION extends ColumnOperations<SCHEMA, KEY>> = OPERATION extends "==" | "!=" ? [null] : OPERATION extends "BETWEEN" ? [DataTypeValue<SCHEMA[KEY]>, DataTypeValue<SCHEMA[KEY]>] : OPERATION extends "CONTAINS" ? [DataTypeArrayValue<SCHEMA[KEY]>] : OPERATION extends Operations<SCHEMA[KEY]> ? [DataTypeValue<SCHEMA[KEY]>] : never;
+}, KEY extends keyof SCHEMA, OPERATION extends ColumnOperations<SCHEMA, KEY>> = OPERATION extends "==" | "!=" ? [null | (OPERATION extends Operations<SCHEMA[KEY]> ? DataTypeValue<SCHEMA[KEY]> : never)] : OPERATION extends "BETWEEN" ? [DataTypeValue<SCHEMA[KEY]>, DataTypeValue<SCHEMA[KEY]>] : OPERATION extends "CONTAINS" ? DataTypeArrayValue<SCHEMA[KEY]>[] : OPERATION extends "IN" ? [DataTypeValue<SCHEMA[KEY]>[]] : OPERATION extends Operations<SCHEMA[KEY]> ? [DataTypeValue<SCHEMA[KEY]>] : never;
+export interface ExpressionBuilderOptions {
+    not?: boolean;
+    condition?: any;
+}
 export declare type ExpressionBuilderFunction<RETURN, SCHEMA extends {
     [key: string]: any;
-}> = (column: string | ((expr: ExpressionBuilder<SCHEMA, any>) => any), operation?: string, value?: string | number | null, value2?: string | number | null, not?: boolean) => RETURN;
+}> = (options: ExpressionBuilderOptions, column: string | ((expr: ExpressionBuilder<SCHEMA, any>) => any), operation?: string, ...values: (string | number | null)[]) => RETURN;
 export declare function createExpressionBuilder<RETURN, SCHEMA extends {
     [key: string]: any;
-}>(builder: ExpressionBuilderFunction<RETURN, SCHEMA>, addNot?: boolean): ExpressionBuilder<SCHEMA, RETURN>;
+}>(builder: ExpressionBuilderFunction<RETURN, SCHEMA>, ...excludedProperties: (keyof ExpressionBuilderExtensions<SCHEMA, RETURN>)[]): ExpressionBuilder<SCHEMA, RETURN>;
 export {};

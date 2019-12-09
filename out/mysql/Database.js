@@ -1,19 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const Table_1 = __importDefault(require("./Table"));
-class MySQLDatabase {
-    constructor(pool) {
-        this.pool = pool;
-    }
-    setPool(pool) {
-        this.pool = pool;
-        return this;
-    }
-    getTable(name, pool = this.pool) {
-        return new Table_1.default(name, pool);
-    }
-}
-exports.default = MySQLDatabase;
+// import { Connection, PoolConnection } from "mysql";
+// import MySQLTable from "./Table";
+// export default class MySQLDatabase<TABLES extends { [key: string]: any }> {
+// 	public constructor (private pool: Connection | PoolConnection) {
+// 	}
+// 	public setPool (pool: Connection | PoolConnection) {
+// 		this.pool = pool;
+// 		return this;
+// 	}
+// 	public getTable<N extends Extract<keyof TABLES, string>> (name: N, pool = this.pool) {
+// 		return new MySQLTable<TABLES[N]>(name, pool);
+// 	}
+// }

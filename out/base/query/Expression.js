@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Expression {
     constructor() {
+        this.lastFilterEditable = false;
         this.filters = [];
     }
     compile() {
@@ -9,21 +10,37 @@ class Expression {
             .join("");
     }
     tweakLastFilter(tweaker) {
+        if (!this.lastFilterEditable)
+            return;
         const existingFilter = this.filters[this.filters.length - 1];
         this.filters[this.filters.length - 1] = () => tweaker(typeof existingFilter === "string" ? existingFilter : existingFilter());
+    }
+    addFilter(filter) {
+        this.filters.push(filter);
     }
 }
 exports.Expression = Expression;
 class ExpressionAndOr {
 }
 exports.ExpressionAndOr = ExpressionAndOr;
-function createExpressionBuilder(builder, addNot = true) {
-    const result = builder;
-    if (addNot) {
-        result.not = createExpressionBuilder((column, operation, value, value2) => {
-            return builder(column, operation, value, value2, true);
-        }, false);
+function createExpressionBuilder(builder, ...excludedProperties) {
+    const resultBuilder = ((column, operation, ...values) => {
+        return builder({}, column, operation, ...values);
+    });
+    if (!excludedProperties.includes("not")) {
+        Object.defineProperty(resultBuilder, "not", {
+            get() {
+                return createExpressionBuilder((options, column, operation, ...values) => builder({ ...options, not: true }, column, operation, ...values));
+            },
+        });
     }
-    return result;
+    if (!excludedProperties.includes("if")) {
+        Object.defineProperty(resultBuilder, "if", {
+            get() {
+                return (condition, column, operation, ...values) => builder({ condition }, column, operation, ...values);
+            },
+        });
+    }
+    return resultBuilder;
 }
 exports.createExpressionBuilder = createExpressionBuilder;
