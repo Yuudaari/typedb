@@ -1,6 +1,6 @@
 import { Client, Pool, PoolClient, QueryResult } from "pg";
 import { Row } from "../../base/DataType";
-import { createExpressionBuilder, ExpressionBuilder, ExpressionBuilderFunction } from "../../base/query/Expression";
+import { createExpressionBuilder, ExpressionBuilder } from "../../base/query/Expression";
 import Update from "../../base/query/Update";
 import Bound from "../../decorator/Bound";
 import Override from "../../decorator/Override";
@@ -20,8 +20,8 @@ export default class PostgresUpdate<SCHEMA extends { [key: string]: any }, RETUR
 	}
 
 	@Override public get where (): ExpressionBuilder<SCHEMA, this> {
-		return createExpressionBuilder((column, operation, value, value2, not) => {
-			(this.expression.is as ExpressionBuilderFunction<any, SCHEMA>)(column, operation, value, value2, not);
+		return createExpressionBuilder((options, column, operation, ...values) => {
+			this.expression.createBuilder(options, column, operation, ...values);
 			return this;
 		});
 	}
@@ -54,7 +54,7 @@ export default class PostgresUpdate<SCHEMA extends { [key: string]: any }, RETUR
 		return { query, values: this.values };
 	}
 
-	@Bound private value (value?: string | number | null) {
+	@Bound private value (value?: string | number | null | (string | number | null)[]) {
 		this.values.push(value);
 		return `$${this.values.length}`;
 	}

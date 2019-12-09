@@ -57,6 +57,7 @@
 		"new-parens": false,
 		"radix": false,
 		"no-bitwise": false,
+		"no-string-literal": false,
 		
         "explicit-override": [
             true,
