@@ -6,5 +6,5 @@ export default class PostgresDatabase<TABLES extends {
     private pool;
     constructor(pool: Client | Pool | PoolClient);
     setPool(pool: Client | Pool | PoolClient): this;
-    getTable<N extends Extract<keyof TABLES, string>>(name: N, pool?: Pool | PoolClient | Client): PostgresTable<TABLES[N]>;
+    getTable<N extends Extract<keyof TABLES, string>>(name: N, pool?: Client | Pool | PoolClient): PostgresTable<TABLES[N]>;
 }

@@ -7,7 +7,7 @@ export declare abstract class Expression<SCHEMA extends {
     private readonly filters;
     abstract get is(): ExpressionBuilder<SCHEMA, ExpressionAndOr<SCHEMA>>;
     compile(): string;
-    protected tweakLastFilter(tweaker: (filter: string) => string): void;
+    protected tweakLastFilter(tweaker: (filter: string, previousFilter?: string | (() => string)) => string): void;
     protected addFilter(filter: string | (() => string)): void;
 }
 export declare abstract class ExpressionAndOr<SCHEMA extends {

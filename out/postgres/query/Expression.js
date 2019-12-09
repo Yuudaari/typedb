@@ -78,14 +78,14 @@ class PostgresExpressionAndOr extends Expression_1.ExpressionAndOr {
     get and() {
         return Expression_1.createExpressionBuilder((options, column, operation, ...values) => {
             this.expression.createBuilder({ ...options, needsNewAndOrBuilder: false }, column, operation, ...values);
-            this.expression["tweakLastFilter"](filter => ` AND ${filter}`);
+            this.expression["tweakLastFilter"]((filter, previous) => previous ? ` AND ${filter}` : filter);
             return this;
         });
     }
     get or() {
         return Expression_1.createExpressionBuilder((options, column, operation, ...values) => {
             this.expression.createBuilder({ ...options, needsNewAndOrBuilder: false }, column, operation, ...values);
-            this.expression["tweakLastFilter"](filter => ` OR ${filter}`);
+            this.expression["tweakLastFilter"]((filter, previous) => previous ? ` OR ${filter}` : filter);
             return this;
         });
     }

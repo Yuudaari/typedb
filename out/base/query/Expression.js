@@ -13,10 +13,12 @@ class Expression {
         if (!this.lastFilterEditable)
             return;
         const existingFilter = this.filters[this.filters.length - 1];
-        this.filters[this.filters.length - 1] = () => tweaker(typeof existingFilter === "string" ? existingFilter : existingFilter());
+        const previousFilter = this.filters[this.filters.length - 2];
+        this.filters[this.filters.length - 1] = () => tweaker(typeof existingFilter === "string" ? existingFilter : existingFilter(), previousFilter);
     }
     addFilter(filter) {
-        this.filters.push(filter);
+        if (filter)
+            this.filters.push(filter);
     }
 }
 exports.Expression = Expression;
