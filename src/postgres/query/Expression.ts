@@ -81,7 +81,7 @@ class PostgresExpressionAndOr<SCHEMA extends { [key: string]: any }> extends Exp
 	@Override public get and (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((options, column, operation, ...values) => {
 			this.expression.createBuilder({ ...options, needsNewAndOrBuilder: false }, column, operation, ...values);
-			this.expression["tweakLastFilter"](filter => ` AND ${filter}`);
+			this.expression["tweakLastFilter"]((filter, previous) => previous ? ` AND ${filter}` : filter);
 			return this;
 		});
 	}
@@ -89,7 +89,7 @@ class PostgresExpressionAndOr<SCHEMA extends { [key: string]: any }> extends Exp
 	@Override public get or (): ExpressionBuilder<SCHEMA, this> {
 		return createExpressionBuilder((options, column, operation, ...values) => {
 			this.expression.createBuilder({ ...options, needsNewAndOrBuilder: false }, column, operation, ...values);
-			this.expression["tweakLastFilter"](filter => ` OR ${filter}`);
+			this.expression["tweakLastFilter"]((filter, previous) => previous ? ` OR ${filter}` : filter);
 			return this;
 		});
 	}

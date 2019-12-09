@@ -12,14 +12,16 @@ export abstract class Expression<SCHEMA extends { [key: string]: any }> {
 			.join("");
 	}
 
-	protected tweakLastFilter (tweaker: (filter: string) => string) {
+	protected tweakLastFilter (tweaker: (filter: string, previousFilter?: string | (() => string)) => string) {
 		if (!this.lastFilterEditable) return;
 		const existingFilter = this.filters[this.filters.length - 1];
-		this.filters[this.filters.length - 1] = () => tweaker(typeof existingFilter === "string" ? existingFilter : existingFilter());
+		const previousFilter = this.filters[this.filters.length - 2];
+		this.filters[this.filters.length - 1] = () =>
+			tweaker(typeof existingFilter === "string" ? existingFilter : existingFilter(), previousFilter);
 	}
 
 	protected addFilter (filter: string | (() => string)) {
-		this.filters.push(filter);
+		if (filter) this.filters.push(filter);
 	}
 }
 
