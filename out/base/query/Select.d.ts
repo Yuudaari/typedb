@@ -4,9 +4,11 @@ export default abstract class Select<SCHEMA extends {
     [key: string]: any;
 }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> {
     protected limitAmount?: number;
+    protected offsetAmount?: number;
     protected orderBy?: OrderBy<COLUMNS[number]>;
     abstract get where(): ExpressionBuilder<SCHEMA, this>;
     limit(amt: number): this;
+    offset(amt: number): this;
     /**
      * @param column The column to order by
      * @param direction The direction, ascending or descending. Defaults to ascending.

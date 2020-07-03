@@ -16,6 +16,10 @@ class Select {
         this.limitAmount = amt;
         return this;
     }
+    offset(amt) {
+        this.offsetAmount = amt;
+        return this;
+    }
     order(orderer, direction) {
         this.orderBy = new OrderBy();
         if (typeof orderer === "function")
