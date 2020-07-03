@@ -7,12 +7,18 @@ import { ExpressionBuilder } from "./Expression";
 export default abstract class Select<SCHEMA extends { [key: string]: any }, COLUMNS extends (keyof SCHEMA)[] = (keyof SCHEMA)[]> {
 
 	protected limitAmount?: number;
+	protected offsetAmount?: number;
 	protected orderBy?: OrderBy<COLUMNS[number]>;
 
 	public abstract get where (): ExpressionBuilder<SCHEMA, this>;
 
 	public limit (amt: number) {
 		this.limitAmount = amt;
+		return this;
+	}
+
+	public offset (amt: number) {
+		this.offsetAmount = amt;
 		return this;
 	}
 
