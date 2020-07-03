@@ -16,9 +16,29 @@ export default abstract class Select<SCHEMA extends { [key: string]: any }, COLU
 		return this;
 	}
 
-	public order (orderer: (by: OrderBy<COLUMNS[number]>["then"]) => any) {
+	/**
+	 * @param column The column to order by
+	 * @param direction The direction, ascending or descending. Defaults to ascending.
+	 */
+	public order (column: COLUMNS[number], direction?: "asc" | "desc"): this;
+	/**
+	 * @param orderer A function that will apply a list of columns and directions to order by.
+	 *
+	 * Example:
+	 * ```ts
+	 * .order(by => by("firstName")
+	 * 	.then("lastName", "desc"))
+	 * ```
+	 */
+	public order (orderer: (by: OrderBy<COLUMNS[number]>["then"]) => any): this;
+	public order (orderer: ((by: OrderBy<COLUMNS[number]>["then"]) => any) | COLUMNS[number], direction?: "asc" | "desc") {
 		this.orderBy = new OrderBy();
-		orderer(this.orderBy.then);
+
+		if (typeof orderer === "function")
+			orderer(this.orderBy.then);
+		else
+			this.orderBy.then(orderer, direction);
+
 		return this;
 	}
 
@@ -29,8 +49,11 @@ export default abstract class Select<SCHEMA extends { [key: string]: any }, COLU
 class OrderBy<COLUMN extends string | number | symbol = string | number | symbol> {
 	protected order: [COLUMN, ("asc" | "desc")?][] = [];
 
-	public then (column: COLUMN): this;
-	public then (column: COLUMN, direction: "asc" | "desc"): this;
+	/**
+	 * @param column The column to order by
+	 * @param direction The direction, ascending or descending. Defaults to ascending.
+	 */
+	public then (column: COLUMN, direction?: "asc" | "desc"): this;
 	@Bound public then (...args: [COLUMN, ("asc" | "desc")?]) {
 		this.order.push(args);
 		return this;
