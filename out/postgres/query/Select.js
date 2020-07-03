@@ -46,6 +46,10 @@ class PostgresSelect extends Select_1.default {
             query += ` WHERE ${where}`;
         if (typeof this.limitAmount === "number")
             query += ` LIMIT ${this.limitAmount}`;
+        if (this.orderBy)
+            query += ` ORDER BY ${this.orderBy["order"]
+                .map(order => order.join(" "))
+                .join(",")}`;
         return { query, values: this.values };
     }
     value(value) {
