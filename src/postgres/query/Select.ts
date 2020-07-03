@@ -44,9 +44,16 @@ export default class PostgresSelect<SCHEMA extends { [key: string]: any }, COLUM
 		let query = `SELECT ${this.columns === "*" ? "*" : this.columns.join(",")} FROM ${this.table.name}`;
 
 		const where = this.expression.compile();
-		if (where) query += ` WHERE ${where}`;
+		if (where)
+			query += ` WHERE ${where}`;
 
-		if (typeof this.limitAmount === "number") query += ` LIMIT ${this.limitAmount}`;
+		if (typeof this.limitAmount === "number")
+			query += ` LIMIT ${this.limitAmount}`;
+
+		if (this.orderBy)
+			query += ` ORDER BY ${this.orderBy["order"]
+				.map(order => order.join(" "))
+				.join(",")}`;
 
 		return { query, values: this.values };
 	}
