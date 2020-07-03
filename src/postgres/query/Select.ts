@@ -47,13 +47,16 @@ export default class PostgresSelect<SCHEMA extends { [key: string]: any }, COLUM
 		if (where)
 			query += ` WHERE ${where}`;
 
-		if (typeof this.limitAmount === "number")
-			query += ` LIMIT ${this.limitAmount}`;
-
 		if (this.orderBy)
 			query += ` ORDER BY ${this.orderBy["order"]
 				.map(order => order.join(" "))
 				.join(",")}`;
+
+		if (typeof this.limitAmount === "number")
+			query += ` LIMIT ${this.limitAmount}`;
+
+		if (typeof this.offsetAmount === "number")
+			query += ` OFFSET ${this.offsetAmount}`;
 
 		return { query, values: this.values };
 	}
