@@ -16,9 +16,12 @@ class Select {
         this.limitAmount = amt;
         return this;
     }
-    order(orderer) {
+    order(orderer, direction) {
         this.orderBy = new OrderBy();
-        orderer(this.orderBy.then);
+        if (typeof orderer === "function")
+            orderer(this.orderBy.then);
+        else
+            this.orderBy.then(orderer, direction);
         return this;
     }
 }
