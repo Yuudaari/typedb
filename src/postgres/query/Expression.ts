@@ -35,7 +35,10 @@ export class PostgresExpression<SCHEMA extends { [key: string]: any }> extends E
 		if (typeof column === "function") {
 			const expr = new PostgresExpression<SCHEMA>(this.registerValue);
 			column(expr.is);
-			this.addFilter(() => `(${notString}(${expr.compile()}))`);
+			this.addFilter(() => {
+				const exprStr = expr.compile();
+				return !exprStr ? "" : notString ? `(${notString}(${exprStr}))` : `${exprStr}`;
+			});
 
 		} else if (values[0] === null)
 			this.addFilter(`(${notString}${column} IS ${operation === "==" ? "" : "NOT"} NULL)`);
